@@ -6,6 +6,9 @@ import DateParserProvider from './kp-date-parser.provider';
  * @ngdoc module
  * @name kpDateParser
  * @module kpDateParser
+ *
+ * @description
+ * This module depends on `luxon` library - [https://moment.github.io/luxon/](https://moment.github.io/luxon/)
  */
 
 export default register('kpDateParser')
