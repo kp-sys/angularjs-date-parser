@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Example - example-kpDateParserExample</title>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.7/angular.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-messages/1.7.7/angular-messages.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@1.11.4/build/global/luxon.min.js"></script>
+  <script src="https://unpkg.com/@kpsys/angularjs-register@1.1.4/dist/register.js"></script>
+  <script src="/angularjs-date-parser.js"></script>
+  <script src="/bower_components/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
+  <script src="script.js"></script>
+  
+
+  
+</head>
+<body ng-app="kpDateParserExample">
+  <main class="container-fluid" ng-form="form" ng-controller="ctrl as ctrl">
+    <div class="row">
+        <div class="col-sm-2 form-group">
+            <label><input type="checkbox" ng-model="minDateValidation">Min Date Validation: </label>
+            <input class="form-control" type="date" ng-disabled="!minDateValidation" ng-model="minDate">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 form-group">
+            <label><input type="checkbox" ng-model="maxDateValidation">Max Date Validation: </label>
+            <input class="form-control" type="date" ng-disabled="!maxDateValidation" ng-model="maxDate">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <input class="form-control"
+            type="text" name="date"
+            ng-model="dateParserModel"
+            kp-date-parser
+            view-format="dd.LL.yyyy"
+            min-date="minDateValidation && minDate ? minDate.toISOString() : null"
+            max-date="maxDateValidation && maxDate ? maxDate.toISOString() : null"
+            >
+        </div>
+        <div class="col-sm-1">
+            <button class="btn btn-default" type="button" ng-click="dateParserModel = ctrl.getNow()">Now</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <label>Date parser model:</label>
+            <input class="form-control" type="text" disabled="disabled" ng-model="dateParserModel">
+        </div>
+    </div>
+    <ng-messages for="form.date.$error">
+        <div ng-message="date">Invalid date</div>
+        <div ng-message="minDate">Min date error</div>
+        <div ng-message="maxDate">Max date error</div>
+    </ng-messages>
+</main>
+</body>
+</html>
