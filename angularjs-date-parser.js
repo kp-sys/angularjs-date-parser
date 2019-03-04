@@ -7,7 +7,7 @@
 		exports["angularjs-date-parser"] = factory(require("@kpsys/angularjs-register"), require("luxon"));
 	else
 		root["angularjs-date-parser"] = factory(root["@kpsys/angularjs-register"], root["luxon"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__kpsys_angularjs_register__, __WEBPACK_EXTERNAL_MODULE_luxon__) {
+})(window, function(__WEBPACK_EXTERNAL_MODULE__2__, __WEBPACK_EXTERNAL_MODULE__4__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -94,13 +94,46 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
-/******/ ({
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
 
-/***/ "./src/kp-date-parser/kp-date-parser.directive.ts":
-/*!********************************************************!*\
-  !*** ./src/kp-date-parser/kp-date-parser.directive.ts ***!
-  \********************************************************/
-/*! no static exports found */
+module.exports = __webpack_require__(1);
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var angularjs_register_1 = __webpack_require__(2);
+
+var kp_date_parser_directive_1 = __webpack_require__(3);
+
+var kp_date_parser_provider_1 = __webpack_require__(5);
+/**
+ * @ngdoc module
+ * @name kpDateParser
+ * @module kpDateParser
+ */
+
+
+exports.default = angularjs_register_1.default('kpDateParser').provider(kp_date_parser_provider_1.default.providerName, kp_date_parser_provider_1.default).directive(kp_date_parser_directive_1.default.directiveName, kp_date_parser_directive_1.default).name();
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__2__;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -116,7 +149,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var luxon_1 = __webpack_require__(/*! luxon */ "luxon"); // @formatter:off
+var luxon_1 = __webpack_require__(4); // @formatter:off
 
 /**
  * @ngdoc directive
@@ -390,42 +423,13 @@ DateParserDirective.directiveName = 'kpDateParser';
 exports.default = DateParserDirective;
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
 
-/***/ "./src/kp-date-parser/kp-date-parser.module.ts":
-/*!*****************************************************!*\
-  !*** ./src/kp-date-parser/kp-date-parser.module.ts ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var angularjs_register_1 = __webpack_require__(/*! @kpsys/angularjs-register */ "@kpsys/angularjs-register");
-
-var kp_date_parser_directive_1 = __webpack_require__(/*! ./kp-date-parser.directive */ "./src/kp-date-parser/kp-date-parser.directive.ts");
-
-var kp_date_parser_provider_1 = __webpack_require__(/*! ./kp-date-parser.provider */ "./src/kp-date-parser/kp-date-parser.provider.ts");
-/**
- * @ngdoc module
- * @name kpDateParser
- * @module kpDateParser
- */
-
-
-exports.default = angularjs_register_1.default('kpDateParser').provider(kp_date_parser_provider_1.default.providerName, kp_date_parser_provider_1.default).directive(kp_date_parser_directive_1.default.directiveName, kp_date_parser_directive_1.default).name();
+module.exports = __WEBPACK_EXTERNAL_MODULE__4__;
 
 /***/ }),
-
-/***/ "./src/kp-date-parser/kp-date-parser.provider.ts":
-/*!*******************************************************!*\
-  !*** ./src/kp-date-parser/kp-date-parser.provider.ts ***!
-  \*******************************************************/
-/*! no static exports found */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -558,42 +562,6 @@ function () {
 DateParserProvider.providerName = 'dateParserService';
 exports.default = DateParserProvider;
 
-/***/ }),
-
-/***/ 0:
-/*!***********************************************************!*\
-  !*** multi ./src/kp-date-parser/kp-date-parser.module.ts ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! ./src/kp-date-parser/kp-date-parser.module.ts */"./src/kp-date-parser/kp-date-parser.module.ts");
-
-
-/***/ }),
-
-/***/ "@kpsys/angularjs-register":
-/*!********************************************!*\
-  !*** external "@kpsys/angularjs-register" ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__kpsys_angularjs_register__;
-
-/***/ }),
-
-/***/ "luxon":
-/*!************************!*\
-  !*** external "luxon" ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_luxon__;
-
 /***/ })
-
-/******/ });
+/******/ ]);
 });
-//# sourceMappingURL=angularjs-date-parser.js.map
