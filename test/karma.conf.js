@@ -5,6 +5,11 @@ module.exports = (config) => {
         basePath: path.resolve(__dirname, '..'),
 
         frameworks: ['jasmine'],
+        client: {
+            jasmine: {
+                random: false
+            }
+        },
 
         files: [
             path.resolve(__dirname, '..', 'node_modules', 'angular', 'angular.js'),
