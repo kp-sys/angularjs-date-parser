@@ -7,6 +7,7 @@
  * @restrict A
  * @priority 100
  *
+ * @requires https://moment.github.io/luxon/ luxon
  * @requires $parse
  * @requires $log
  * @requires service:dateParserService
@@ -18,7 +19,7 @@
  *
  * @description
  * This directive converts model from date inserted by user to ISO format. Directive tries more formats specified in constant.
- * If input does not match any format, mgModel is null.
+ * If input does not match any format, ngModel is null.
  *
  * Directive also adds some validation functions.
  *
@@ -110,6 +111,9 @@
  * @ngdoc module
  * @name kpDateParser
  * @module kpDateParser
+ *
+ * @description
+ * This module depends on `luxon` library - [https://moment.github.io/luxon/](https://moment.github.io/luxon/)
  *//**
  * @ngdoc service
  * @module kpDateParser

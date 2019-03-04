@@ -121,6 +121,9 @@ var kp_date_parser_provider_1 = __webpack_require__(5);
  * @ngdoc module
  * @name kpDateParser
  * @module kpDateParser
+ *
+ * @description
+ * This module depends on `luxon` library - [https://moment.github.io/luxon/](https://moment.github.io/luxon/)
  */
 
 
@@ -159,6 +162,7 @@ var luxon_1 = __webpack_require__(4); // @formatter:off
  * @restrict A
  * @priority 100
  *
+ * @requires https://moment.github.io/luxon/ luxon
  * @requires $parse
  * @requires $log
  * @requires service:dateParserService
@@ -170,7 +174,7 @@ var luxon_1 = __webpack_require__(4); // @formatter:off
  *
  * @description
  * This directive converts model from date inserted by user to ISO format. Directive tries more formats specified in constant.
- * If input does not match any format, mgModel is null.
+ * If input does not match any format, ngModel is null.
  *
  * Directive also adds some validation functions.
  *
