@@ -13,6 +13,7 @@
  * @requires service:dateParserService
  *
  * @param {string} ngModel Directive model
+ * @param {string=} kpDateParser Custom parsing format.
  * @param {string=} viewFormat Specific view date format. Default is `'d.L.y'`.
  * @param {expression=} minDate Minimum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  * @param {expression=} maxDate Maximum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
@@ -93,6 +94,7 @@
 /**
      * Convert string date to JS Date using more formats. If no luck, return `null`.
      */
+/* TODO: Move this method to service*/
 /* istanbul ignore next */
 /**
      * Validates user input if is correct according to parser formats.

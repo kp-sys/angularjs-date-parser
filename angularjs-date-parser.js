@@ -168,6 +168,7 @@ var luxon_1 = __webpack_require__(4); // @formatter:off
  * @requires service:dateParserService
  *
  * @param {string} ngModel Directive model
+ * @param {string=} kpDateParser Custom parsing format.
  * @param {string=} viewFormat Specific view date format. Default is `'d.L.y'`.
  * @param {expression=} minDate Minimum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  * @param {expression=} maxDate Maximum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
@@ -262,12 +263,12 @@ function () {
   _createClass(DateParserDirective, [{
     key: "link",
     value: function link($scope, $element, $attrs, ngModelController) {
-      ngModelController.$parsers.push(this.parse.bind(this));
       var viewFormat = $attrs.viewFormat || this.dateParserService.getViewFormat();
       ngModelController.$formatters.push(this.fromISOToFormattedDate(viewFormat));
-      ngModelController.$validators.date = this.validateInput.bind(this);
-      ngModelController.$validators.minDate = this.validateMinDate($scope, $attrs).bind(this);
-      ngModelController.$validators.maxDate = this.validateMaxDate($scope, $attrs).bind(this);
+      ngModelController.$parsers.push(this.parse.bind(this, viewFormat));
+      ngModelController.$validators.date = this.validateInput.bind(this, viewFormat);
+      ngModelController.$validators.minDate = this.validateMinDate($scope, $attrs, viewFormat).bind(this);
+      ngModelController.$validators.maxDate = this.validateMaxDate($scope, $attrs, viewFormat).bind(this);
       $scope.$watchGroup([$attrs.minDate, $attrs.maxDate], function () {
         return ngModelController.$validate();
       });
@@ -296,7 +297,8 @@ function () {
 
   }, {
     key: "parse",
-    value: function parse(date) {
+    value: function parse(customParsingFormat, date) {
+      // TODO: Move this method to service
       if (!date) {
         return null;
       }
@@ -306,6 +308,11 @@ function () {
           isValid: false
         };
         var dateFormats = this.dateParserService.getParsingPipeline();
+
+        if (customParsingFormat) {
+          dateFormats.push(customParsingFormat);
+        }
+
         var formatsIterator = dateFormats[Symbol.iterator]();
         var format = formatsIterator.next();
 
@@ -330,13 +337,13 @@ function () {
 
   }, {
     key: "validateInput",
-    value: function validateInput(model, view) {
+    value: function validateInput(customParsingFormat, model, view) {
       // required validation must be provided by another directive
       if (!view) {
         return true;
       }
 
-      return this.parse(view) !== null;
+      return this.parse(customParsingFormat, view) !== null;
     }
     /**
      * Validates if view date is greater then or equal user specified min date.
@@ -344,11 +351,11 @@ function () {
 
   }, {
     key: "validateMinDate",
-    value: function validateMinDate($scope, $attrs) {
+    value: function validateMinDate($scope, $attrs, customParsingFormat) {
       var _this = this;
 
       return function (model, view) {
-        var currentDate = _this.parse(view);
+        var currentDate = _this.parse(customParsingFormat, view);
 
         if (currentDate === null) {
           return true;
@@ -384,11 +391,11 @@ function () {
 
   }, {
     key: "validateMaxDate",
-    value: function validateMaxDate($scope, $attrs) {
+    value: function validateMaxDate($scope, $attrs, customParsingFormat) {
       var _this2 = this;
 
       return function (model, view) {
-        var currentDate = _this2.parse(view);
+        var currentDate = _this2.parse(customParsingFormat, view);
 
         if (currentDate === null) {
           return true;
@@ -423,8 +430,8 @@ function () {
   return DateParserDirective;
 }();
 
-DateParserDirective.directiveName = 'kpDateParser';
 exports.default = DateParserDirective;
+DateParserDirective.directiveName = 'kpDateParser';
 
 /***/ }),
 /* 4 */
@@ -563,8 +570,8 @@ function () {
   return DateParserProvider;
 }();
 
-DateParserProvider.providerName = 'dateParserService';
 exports.default = DateParserProvider;
+DateParserProvider.providerName = 'dateParserService';
 
 /***/ })
 /******/ ]);
