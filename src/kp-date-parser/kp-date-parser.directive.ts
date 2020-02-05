@@ -17,6 +17,7 @@ import {DateParserService} from './kp-date-parser.provider';
  * @requires service:dateParserService
  *
  * @param {string} ngModel Directive model
+ * @param {string=} kpDateParser Custom parsing format.
  * @param {string=} viewFormat Specific view date format. Default is `'d.L.y'`.
  * @param {expression=} minDate Minimum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  * @param {expression=} maxDate Maximum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
@@ -101,14 +102,14 @@ export default class DateParserDirective {
     }
 
     public link($scope: IScope, $element, $attrs: IAttributes, ngModelController: INgModelController) {
-        ngModelController.$parsers.push(this.parse.bind(this));
-
         const viewFormat = $attrs.viewFormat || this.dateParserService.getViewFormat();
         ngModelController.$formatters.push(this.fromISOToFormattedDate(viewFormat));
 
-        ngModelController.$validators.date = this.validateInput.bind(this);
-        ngModelController.$validators.minDate = this.validateMinDate($scope, $attrs).bind(this);
-        ngModelController.$validators.maxDate = this.validateMaxDate($scope, $attrs).bind(this);
+        ngModelController.$parsers.push(this.parse.bind(this, viewFormat));
+
+        ngModelController.$validators.date = this.validateInput.bind(this, viewFormat);
+        ngModelController.$validators.minDate = this.validateMinDate($scope, $attrs, viewFormat).bind(this);
+        ngModelController.$validators.maxDate = this.validateMaxDate($scope, $attrs, viewFormat).bind(this);
 
         $scope.$watchGroup([$attrs.minDate, $attrs.maxDate], () => ngModelController.$validate());
     }
@@ -132,7 +133,8 @@ export default class DateParserDirective {
     /**
      * Convert string date to JS Date using more formats. If no luck, return `null`.
      */
-    private parse(date: string): string {
+    private parse(customParsingFormat: string, date: string): string {
+        // TODO: Move this method to service
         if (!date) {
             return null;
         }
@@ -141,6 +143,11 @@ export default class DateParserDirective {
             let result = {isValid: false};
 
             const dateFormats = this.dateParserService.getParsingPipeline();
+
+            if (customParsingFormat) {
+                dateFormats.push(customParsingFormat);
+            }
+
             const formatsIterator = dateFormats[Symbol.iterator]();
             let format = formatsIterator.next();
 
@@ -163,21 +170,21 @@ export default class DateParserDirective {
     /**
      * Validates user input if is correct according to parser formats.
      */
-    private validateInput(model: string, view: string): boolean {
+    private validateInput(customParsingFormat: string, model: string, view: string): boolean {
         // required validation must be provided by another directive
         if (!view) {
             return true;
         }
 
-        return this.parse(view) !== null;
+        return this.parse(customParsingFormat, view) !== null;
     }
 
     /**
      * Validates if view date is greater then or equal user specified min date.
      */
-    private validateMinDate($scope: IScope, $attrs: IAttributes): (model: string, view: string) => boolean {
+    private validateMinDate($scope: IScope, $attrs: IAttributes, customParsingFormat: string): (model: string, view: string) => boolean {
         return (model, view) => {
-            const currentDate = this.parse(view);
+            const currentDate = this.parse(customParsingFormat, view);
             if (currentDate === null) {
                 return true;
             }
@@ -209,9 +216,9 @@ export default class DateParserDirective {
     /**
      * Validates if view date is less then or equal user specified max date.
      */
-    public validateMaxDate($scope: IScope, $attrs: IAttributes): (model: string, view: string) => boolean {
+    public validateMaxDate($scope: IScope, $attrs: IAttributes, customParsingFormat: string, ): (model: string, view: string) => boolean {
         return (model, view) => {
-            const currentDate = this.parse(view);
+            const currentDate = this.parse(customParsingFormat, view);
             if (currentDate === null) {
                 return true;
             }
