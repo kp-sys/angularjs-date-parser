@@ -1,18 +1,12 @@
 language: node_js
-sudo: false
 
 os: linux
 
 addons:
   chrome: stable
 
-env:
-  global:
-    - NODE_VERSION=10
-
-before_install:
-  - nvm install $NODE_VERSION
-  - npm install -g npm@6 && node -v && npm -v
+node_js:
+  - "12.14.1"
 
 install:
   - npm ci
@@ -22,18 +16,24 @@ script:
   - CHROMIUM_BIN="/usr/bin/google-chrome" npm test
   - EXAMPLES_SCRIPTS_URL_PREFIX="https://dostaltomas.github.io/angularjs-date-parser" npm run docs:build
 
-deploy:
-  - provider: pages
-    skip-cleanup: true
-    github-token: $GH_TOKEN
-    keep-history: true
-    local_dir: "dist/docs"
-    on:
-      branch: master
+jobs:
+  include:
+    - stage: Github Deployment
+      deploy:
+        provider: pages
+        skip-cleanup: true
+        github-token: $GH_TOKEN
+        keep-history: true
+        local_dir: "dist/docs"
+        on:
+          branch: master
 
-  - provider: npm
-    email: "tomas.dostal@kpsys.cz"
-    api_key: $NPM_TOKEN
-    skip_cleanup: true
-    on:
-      branch: master
+    - stage: Deploy to NPM
+      deploy:
+        edge: true
+        provider: npm
+        email: "tomas.dostal@kpsys.cz"
+        api_key: "$NPM_TOKEN"
+        skip_cleanup: true
+        on:
+          branch: master
