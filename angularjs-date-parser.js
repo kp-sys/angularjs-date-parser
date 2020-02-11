@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define(["@kpsys/angularjs-register", "luxon"], factory);
 	else if(typeof exports === 'object')
-		exports["angularjs-date-parser"] = factory(require("@kpsys/angularjs-register"), require("luxon"));
+		exports["@kpsys/angularjs-date-parser"] = factory(require("@kpsys/angularjs-register"), require("luxon"));
 	else
-		root["angularjs-date-parser"] = factory(root["@kpsys/angularjs-register"], root["luxon"]);
+		root["@kpsys/angularjs-date-parser"] = factory(root["@kpsys/angularjs-register"], root["luxon"]);
 })(window, function(__WEBPACK_EXTERNAL_MODULE__2__, __WEBPACK_EXTERNAL_MODULE__4__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
