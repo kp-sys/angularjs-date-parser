@@ -1,6 +1,19 @@
-import {DateTime} from 'luxon';
+import {DateTime, LocalZone} from 'luxon';
 import {IAttributes, ILogService, INgModelController, IParseService, IScope} from 'angular';
 import {DateParserService} from './kp-date-parser.provider';
+
+// https://github.com/moment/luxon/issues/632
+function tzIncludingSecondsBugWorkaround(date) {
+    if (date) {
+        const tz = date.split('T')[1].match(/[+-].*$/);
+        if (tz && tz[0] && tz[0].length > 8) {
+            // @ts-ignore Property instance EXISTS on LocalZone class
+            return date.replace(tz[0], LocalZone.instance.formatOffset(new Date().getTimezoneOffset(), 'short'));
+        }
+    }
+
+    return date;
+}
 
 // @formatter:off
 /**
@@ -157,7 +170,7 @@ export default class DateParserDirective {
             }
 
             if (result.isValid) {
-                return (result as DateTime).toISO();
+                return tzIncludingSecondsBugWorkaround((result as DateTime).toISO());
             }
         } catch (e) {
             /* istanbul ignore next */

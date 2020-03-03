@@ -280,6 +280,30 @@ describe('kp-date-parser directive', () => {
 
     describe('provider -> directive', () => {
 
+        it('should parse date before year 1891', () => {
+
+            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
+                dateParserServiceProvider.pushNewFormatToPipeline('y');
+            });
+
+            // tslint:disable-next-line:variable-name
+            inject((_$compile_, _$rootScope_) => {
+                $compile = _$compile_;
+                $scope = _$rootScope_;
+            });
+
+            $scope.model = '';
+            const input = compileElement('<input type="text" ng-model="model" kp-date-parser>');
+            const year = DateTime.fromISO('1018-03-05').year;
+            const date = '1018';
+
+            changeInputValue(input, date);
+
+            expect(DateTime.fromISO($scope.model).year).toBe(year);
+
+        });
+
+
         it('should parse added format via provider', () => {
             angular.mock.module(directivesModule, (dateParserServiceProvider) => {
                 dateParserServiceProvider.pushNewFormatToPipeline('dd.LL.y HH:mm');
