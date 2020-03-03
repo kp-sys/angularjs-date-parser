@@ -152,7 +152,21 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var luxon_1 = __webpack_require__(4); // @formatter:off
+var luxon_1 = __webpack_require__(4); // https://github.com/moment/luxon/issues/632
+
+
+function tzIncludingSecondsBugWorkaround(date) {
+  if (date) {
+    var tz = date.split('T')[1].match(/[+-].*$/);
+
+    if (tz && tz[0] && tz[0].length > 8) {
+      // @ts-ignore Property instance EXISTS on LocalZone class
+      return date.replace(tz[0], luxon_1.LocalZone.instance.formatOffset(new Date().getTimezoneOffset(), 'short'));
+    }
+  }
+
+  return date;
+} // @formatter:off
 
 /**
  * @ngdoc directive
@@ -322,7 +336,7 @@ function () {
         }
 
         if (result.isValid) {
-          return result.toISO();
+          return tzIncludingSecondsBugWorkaround(result.toISO());
         }
       } catch (e) {
         /* istanbul ignore next */

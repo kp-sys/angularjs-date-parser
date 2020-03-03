@@ -1,3 +1,5 @@
+/* https://github.com/moment/luxon/issues/632*/
+/* @ts-ignore Property instance EXISTS on LocalZone class*/
 /* @formatter:off*/
 /**
  * @ngdoc directive
@@ -179,6 +181,7 @@
              * @description
              * Returns default view format
              *//* tslint:disable-next-line:variable-name*/
+/* tslint:disable-next-line:variable-name*/
 /* tslint:disable-next-line:variable-name*/
 /* tslint:disable-next-line:variable-name*/
 /* tslint:disable-next-line:variable-name*/
