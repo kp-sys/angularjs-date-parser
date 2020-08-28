@@ -9,7 +9,6 @@ import KpDateParserValidationService from './kp-date-parser-validation.service';
  * @module kpDateParser
  *
  * @restrict A
- * @priority 100
  *
  * @requires https://moment.github.io/luxon/ luxon
  * @requires $parse
@@ -102,7 +101,6 @@ export default class DateParserDirective {
 
     public restrict = 'A';
     public require = 'ngModel';
-    public priority = 100;
 
     /*@ngInject*/
     constructor(private $parse: IParseService, private kpDateParserService: KpDateParserService, private kpDateParserValidationService: KpDateParserValidationService) {
