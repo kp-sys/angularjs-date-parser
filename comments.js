@@ -56,7 +56,6 @@
  * @module kpDateParser
  *
  * @restrict A
- * @priority 100
  *
  * @requires https://moment.github.io/luxon/ luxon
  * @requires $parse

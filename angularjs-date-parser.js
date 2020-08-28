@@ -166,7 +166,6 @@ Object.defineProperty(exports, "__esModule", {
  * @module kpDateParser
  *
  * @restrict A
- * @priority 100
  *
  * @requires https://moment.github.io/luxon/ luxon
  * @requires $parse
@@ -263,7 +262,6 @@ function () {
     this.kpDateParserValidationService = kpDateParserValidationService;
     this.restrict = 'A';
     this.require = 'ngModel';
-    this.priority = 100;
   }
 
   _createClass(DateParserDirective, [{
