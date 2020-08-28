@@ -1,6 +1,55 @@
-/* https://github.com/moment/luxon/issues/632*/
-/* @ts-ignore Property instance EXISTS on LocalZone class*/
-/* @formatter:off*/
+/**
+ * @ngdoc service
+ * @name kpDateParserValidation
+ * @module
+ *
+ * @description
+ * Validation service.
+ */
+/*@ngInject*/
+/**
+     * @ngdoc method
+     * @name kpDateParserValidation#validateDate
+     *
+     * @param {string=} customViewFormatProvider Custom view format provider passed from directive.
+     *
+     * @description
+     * Function returns validator on valid date.
+     */
+/**
+     * @ngdoc method
+     * @name kpDateParserValidation#validateMinDate
+     *
+     * @param {function(): string} minDateInISOProvider Date in ISO format provider.
+     * @param {function(): string=} customViewFormat Custom view format provider passed from directive.
+     * @param {function(): string=} customModelFormat Custom model format provider passed from directive.
+     *
+     * @description
+     * Function returns validation on min date.
+     */
+/**
+     * @ngdoc method
+     * @name kpDateParserValidation#validateMaxDate
+     *
+     * @param {function(): string} maxDateInISOProvider Date in ISO format provider.
+     * @param {function(): string=} customViewFormat Custom view format provider passed from directive.
+     * @param {function(): string=} customModelFormat Custom model format provider passed from directive.
+     *
+     * @description
+     * Function returns validation on max date.
+     */
+/**
+     * This function performs some checks and parsings of input dates and then returns `comparator` result.
+     *
+     * @param {function(): string} restrictingDateInISOProvider Validated date provider.
+     * @param {function(): string} customViewFormat Custom view format provider passed from directive.
+     * @param {function(): string} customModelFormat Custom model format provider passed from directive.
+     * @param {(currentDate: DateTime, restrictingDate: DateTime) => boolean} comparator Executive logic.
+     *
+     * @returns {ValidatorFunction}
+     * @private
+     */
+/* istanbul ignore else *//* @formatter:off*/
 /**
  * @ngdoc directive
  * @name kpDateParser
@@ -13,10 +62,11 @@
  * @requires $parse
  * @requires $log
  * @requires service:dateParserService
+ * @requires ngModel
  *
- * @param {string} ngModel Directive model
- * @param {string=} kpDateParser Custom parsing format.
- * @param {string=} viewFormat Specific view date format. Default is `'d.L.y'`.
+ * @param {string} kpDateParserModelFormat Custom model format.
+ * @param {string} kpDateParserViewFormat Custom view format.
+ *
  * @param {expression=} minDate Minimum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  * @param {expression=} maxDate Maximum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  *
@@ -88,66 +138,97 @@
  * </example>
  */
 /* @formatter:on*/
-/*@ngInject*/
-/**
-     * Convert [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date format to JS {@link Date}.
-     * If input is not valid ISO date in string, return original value.
-     */
-/**
-     * Convert string date to JS Date using more formats. If no luck, return `null`.
-     */
-/* TODO: Move this method to service*/
-/* istanbul ignore next */
-/**
-     * Validates user input if is correct according to parser formats.
-     */
-/* required validation must be provided by another directive*/
-/**
-     * Validates if view date is greater then or equal user specified min date.
-     */
-/* istanbul ignore else */
-/* istanbul ignore else */
-/**
-     * Validates if view date is less then or equal user specified max date.
-     */
-/* istanbul ignore else */
-/* istanbul ignore else *//**
+/*@ngInject*//**
  * @ngdoc module
  * @name kpDateParser
  * @module kpDateParser
  *
  * @description
  * This module depends on `luxon` library - [https://moment.github.io/luxon/](https://moment.github.io/luxon/)
- *//**
+ *//* https://github.com/moment/luxon/issues/632*/
+/* @ts-ignore*/
+/**
  * @ngdoc service
  * @module kpDateParser
- * @name dateParserService
+ * @name kpDateParserService
  */
+/**
+     * @ngdoc method
+     * @name kpDateParserService#getParsingPipeline
+     *
+     * @returns {string[]}
+     *
+     * @description
+     * Returns parsing pipeline.
+     */
+/**
+     * @ngdoc method
+     * @name kpDateParserService#getDefaultModelFormat
+     *
+     * @returns {string}
+     *
+     * @description
+     * Returns default model format.
+     */
+/**
+     * @ngdoc method
+     * @name kpDateParserService#parse
+     *
+     * @param {string} parsingDate
+     * @param {string=} customModelFormatProvider
+     * @param {string=} customViewFormatProvider
+     *
+     * @returns {string} Parsed date in ISO / customModelFormatProvider / defaultModelFormat.
+     *
+     * @description
+     * Function tries to parse date using formats pipeline and if no format matches, it tries to use `customViewFormatProvider` if it is specified.\
+     * Then parse date and returns it formatted using `customModelFormatProvider` or if it is not specified, `defaultModelFormat`.
+     * If no model format specified it returns ISO format.
+     *
+     * If no format matches, it returns `null`.
+     */
+/**
+     * @ngdoc method
+     * @name kpDateParserService#format
+     *
+     * @param {string} formattingDate
+     * @param {string=} customModelFormatProvider
+     * @param {string=} customViewFormatProvider
+     *
+     * @returns {string} Formatted date in ISO / customViewFormatProvider.
+     *
+     * @description
+     * Function tries to parse date using `customModelFormatProvider` or if it is not specified, `defaultModelFormat`.
+     * If no format specified, ISO format is used.
+     * Then it is formatted with `customViewFormatProvider` or ISO is used.
+     *
+     * If parsing is unsuccessful, it returns `null`.
+     */
 /**
  * @ngdoc provider
  * @module kpDateParser
- * @name dateParserServiceProvider
+ * @name kpDateParserServiceProvider
  *
  * @description
  * Provider for {@link directive:kpDateParser} directive providing default settings.
  */
 /**
      * @ngdoc method
-     * @name dateParserServiceProvider#clearDateFormatsPipeline
+     * @name kpDateParserServiceProvider#clearDateFormatsPipeline
      *
      * @description
      * Clear parsing pipeline.
      */
 /**
      * @ngdoc method
-     * @name dateParserServiceProvider#setFormatsPipelineToDefault
+     * @name kpDateParserServiceProvider#setFormatsPipelineToDefault
      *
      * @description
      * Roll back parsing pipes to default values
      */
 /**
      * @ngdoc method
-     * @name dateParserServiceProvider#pushNewFormatToPipeline
+     * @name kpDateParserServiceProvider#pushNewFormatToPipeline
      *
      * @param {string} format New format to push
      *
@@ -156,33 +237,29 @@
      */
 /**
      * @ngdoc method
-     * @name dateParserServiceProvider#setViewDefaultFormat
-     *
-     * @param {string} format New default view format
+     * @name kpDateParserServiceProvider#setDefaultModelFormat
      *
      * @description
-     * Set default view format
+     * Set default model format. If not set, model will be parsed into ISO format of specific format given by {@link directive:kpDateParser}.
      */
-/**
-             * @ngdoc method
-             * @name dateParserService#getParsingPipeline
-             *
-             * @returns {string[]}
-             *
-             * @description
-             * Returns parsing formats
-             */
-/**
-             * @ngdoc method
-             * @name dateParserService#getViewFormat
-             *
-             * @returns {string}
-             *
-             * @description
-             * Returns default view format
-             *//* tslint:disable-next-line:variable-name*/
+/*@ngInject*/
+/* istanbul ignore next */
+/* istanbul ignore next *//*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
 /* tslint:disable-next-line:variable-name*/
-/* tslint:disable-next-line:variable-name*/
-/* tslint:disable-next-line:variable-name*/
-/* tslint:disable-next-line:variable-name*/
+/*@ngInject*/
+/*@ngInject*/
+/*@ngInject*/
 /* tslint:disable-next-line:variable-name*/

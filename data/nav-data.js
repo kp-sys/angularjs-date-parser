@@ -27,9 +27,9 @@ angular.module('docApp').constant('DOCS_NAVIGATION', {
             "href": "api/kpDateParser/provider",
             "navItems": [
               {
-                "name": "dateParserServiceProvider",
+                "name": "kpDateParserServiceProvider",
                 "type": "provider",
-                "href": "api/kpDateParser/provider/dateParserServiceProvider"
+                "href": "api/kpDateParser/provider/kpDateParserServiceProvider"
               }
             ]
           },
@@ -39,9 +39,9 @@ angular.module('docApp').constant('DOCS_NAVIGATION', {
             "href": "api/kpDateParser/service",
             "navItems": [
               {
-                "name": "dateParserService",
+                "name": "kpDateParserService",
                 "type": "service",
-                "href": "api/kpDateParser/service/dateParserService"
+                "href": "api/kpDateParser/service/kpDateParserService"
               }
             ]
           }
