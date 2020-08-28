@@ -1,19 +1,6 @@
-import {DateTime, LocalZone} from 'luxon';
-import {IAttributes, ILogService, INgModelController, IParseService, IScope} from 'angular';
-import {DateParserService} from './kp-date-parser.provider';
-
-// https://github.com/moment/luxon/issues/632
-function tzIncludingSecondsBugWorkaround(date) {
-    if (date) {
-        const tz = date.split('T')[1].match(/[+-].*$/);
-        if (tz && tz[0] && tz[0].length > 8) {
-            // @ts-ignore Property instance EXISTS on LocalZone class
-            return date.replace(tz[0], LocalZone.instance.formatOffset(new Date().getTimezoneOffset(), 'short'));
-        }
-    }
-
-    return date;
-}
+import {IAttributes, INgModelController, IParseService, IScope} from 'angular';
+import {KpDateParserService} from './kp-date-parser.provider';
+import KpDateParserValidationService from './kp-date-parser-validation.service';
 
 // @formatter:off
 /**
@@ -28,10 +15,11 @@ function tzIncludingSecondsBugWorkaround(date) {
  * @requires $parse
  * @requires $log
  * @requires service:dateParserService
+ * @requires ngModel
  *
- * @param {string} ngModel Directive model
- * @param {string=} kpDateParser Custom parsing format.
- * @param {string=} viewFormat Specific view date format. Default is `'d.L.y'`.
+ * @param {string} kpDateParserModelFormat Custom model format.
+ * @param {string} kpDateParserViewFormat Custom view format.
+ *
  * @param {expression=} minDate Minimum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  * @param {expression=} maxDate Maximum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  *
@@ -104,159 +92,51 @@ function tzIncludingSecondsBugWorkaround(date) {
  */
 // @formatter:on
 export default class DateParserDirective {
-    public static directiveName = 'kpDateParser';
+    public static readonly directiveName = 'kpDateParser';
+
+    private static readonly MODEL_FORMAT_ATTRIBUTE = 'kpDateParserModelFormat';
+    private static readonly VIEW_FORMAT_ATTRIBUTE = 'kpDateParserViewFormat';
+
+    private static readonly MIN_VALIDATION_ATTRIBUTE = 'minDate';
+    private static readonly MAX_VALIDATION_ATTRIBUTE = 'maxDate';
 
     public restrict = 'A';
     public require = 'ngModel';
     public priority = 100;
 
     /*@ngInject*/
-    constructor(private $parse: IParseService, private $log: ILogService, private dateParserService: DateParserService) {
+    constructor(private $parse: IParseService, private kpDateParserService: KpDateParserService, private kpDateParserValidationService: KpDateParserValidationService) {
     }
 
     public link($scope: IScope, $element, $attrs: IAttributes, ngModelController: INgModelController) {
-        const viewFormat = $attrs.viewFormat || this.dateParserService.getViewFormat();
-        ngModelController.$formatters.push(this.fromISOToFormattedDate(viewFormat));
+        let customModelFormat: string = null;
+        let customViewFormat: string = null;
+        let minValidationDate: string = null;
+        let maxValidationDate: string = null;
 
-        ngModelController.$parsers.push(this.parse.bind(this, viewFormat));
+        const refreshAttributes = () => {
+            customModelFormat = this.$parse($attrs[DateParserDirective.MODEL_FORMAT_ATTRIBUTE])($scope);
+            customViewFormat = this.$parse($attrs[DateParserDirective.VIEW_FORMAT_ATTRIBUTE])($scope);
 
-        ngModelController.$validators.date = this.validateInput.bind(this, viewFormat);
-        ngModelController.$validators.minDate = this.validateMinDate($scope, $attrs, viewFormat).bind(this);
-        ngModelController.$validators.maxDate = this.validateMaxDate($scope, $attrs, viewFormat).bind(this);
-
-        $scope.$watchGroup([$attrs.minDate, $attrs.maxDate], () => ngModelController.$validate());
-    }
-
-    /**
-     * Convert [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date format to JS {@link Date}.
-     * If input is not valid ISO date in string, return original value.
-     */
-    private fromISOToFormattedDate(viewFormat: string): (isoDate: string) => string {
-        return (isoDate) => {
-            const dateTime = DateTime.fromISO(isoDate);
-
-            if (typeof isoDate === 'string' && dateTime.isValid) {
-                return dateTime.toFormat(viewFormat);
-            }
-
-            return isoDate;
+            minValidationDate = this.$parse($attrs[DateParserDirective.MIN_VALIDATION_ATTRIBUTE])($scope);
+            maxValidationDate = this.$parse($attrs[DateParserDirective.MAX_VALIDATION_ATTRIBUTE])($scope);
         };
-    }
 
-    /**
-     * Convert string date to JS Date using more formats. If no luck, return `null`.
-     */
-    private parse(customParsingFormat: string, date: string): string {
-        // TODO: Move this method to service
-        if (!date) {
-            return null;
-        }
+        ngModelController.$formatters.push((modelValue) => this.kpDateParserService.format(modelValue, () => customModelFormat, () => customViewFormat));
+        ngModelController.$parsers.push((viewValue) => this.kpDateParserService.parse(viewValue, () => customModelFormat, () => customViewFormat));
 
-        try {
-            let result = {isValid: false};
+        ngModelController.$validators.date = this.kpDateParserValidationService.validateDate(() => customViewFormat);
+        ngModelController.$validators.minDate = this.kpDateParserValidationService.validateMinDate(() => minValidationDate, () => customViewFormat, () => customModelFormat);
+        ngModelController.$validators.maxDate = this.kpDateParserValidationService.validateMaxDate(() => maxValidationDate, () => customViewFormat, () => customModelFormat);
 
-            const dateFormats = this.dateParserService.getParsingPipeline();
+        $scope.$watchGroup([$attrs[DateParserDirective.MIN_VALIDATION_ATTRIBUTE], $attrs[DateParserDirective.MAX_VALIDATION_ATTRIBUTE]], () => {
+            refreshAttributes();
+            ngModelController.$validate();
+        });
 
-            if (customParsingFormat) {
-                dateFormats.push(customParsingFormat);
-            }
-
-            const formatsIterator = dateFormats[Symbol.iterator]();
-            let format = formatsIterator.next();
-
-            while (!result.isValid && !format.done) {
-                result = DateTime.fromFormat(date, format.value);
-                format = formatsIterator.next();
-            }
-
-            if (result.isValid) {
-                return tzIncludingSecondsBugWorkaround((result as DateTime).toISO());
-            }
-        } catch (e) {
-            /* istanbul ignore next */
-            this.$log.debug('DateParserDirective#parse: ', e);
-        }
-
-        return null;
-    }
-
-    /**
-     * Validates user input if is correct according to parser formats.
-     */
-    private validateInput(customParsingFormat: string, model: string, view: string): boolean {
-        // required validation must be provided by another directive
-        if (!view) {
-            return true;
-        }
-
-        return this.parse(customParsingFormat, view) !== null;
-    }
-
-    /**
-     * Validates if view date is greater then or equal user specified min date.
-     */
-    private validateMinDate($scope: IScope, $attrs: IAttributes, customParsingFormat: string): (model: string, view: string) => boolean {
-        return (model, view) => {
-            const currentDate = this.parse(customParsingFormat, view);
-            if (currentDate === null) {
-                return true;
-            }
-
-            if ($attrs.minDate) {
-                const parsedMinDate = this.$parse($attrs.minDate)($scope);
-
-                /* istanbul ignore else */
-                if (parsedMinDate) {
-                    const minDate = DateTime.fromISO(parsedMinDate);
-
-                    /* istanbul ignore else */
-                    if (minDate.isValid) {
-                        return minDate <= DateTime.fromISO(currentDate);
-                    } else {
-                        this.$log.warn(`DateParserDirective: minDate argument for date validation is not in ISO format: ${parsedMinDate}`);
-                    }
-                } else {
-                    if (parsedMinDate !== null) {
-                        this.$log.warn(`DateParserDirective: minDate argument for date validation cannot be parsed: ${$attrs.minDate}`);
-                    }
-                }
-            }
-
-            return true;
-        };
-    }
-
-    /**
-     * Validates if view date is less then or equal user specified max date.
-     */
-    public validateMaxDate($scope: IScope, $attrs: IAttributes, customParsingFormat: string, ): (model: string, view: string) => boolean {
-        return (model, view) => {
-            const currentDate = this.parse(customParsingFormat, view);
-            if (currentDate === null) {
-                return true;
-            }
-
-            if ($attrs.maxDate) {
-                const parsedMaxDate = this.$parse($attrs.maxDate)($scope);
-
-                /* istanbul ignore else */
-                if (parsedMaxDate) {
-                    const maxDate = DateTime.fromISO(parsedMaxDate);
-
-                    /* istanbul ignore else */
-                    if (maxDate.isValid) {
-                        return DateTime.fromISO(currentDate) <= maxDate;
-                    } else {
-                        this.$log.warn(`DateParserDirective: maxDate argument for date validation is not in ISO format: ${parsedMaxDate}`);
-                    }
-                } else {
-                    if (parsedMaxDate !== null) {
-                        this.$log.warn(`DateParserDirective: maxDate argument for date validation cannot be parsed: ${$attrs.maxDate}`);
-                    }
-                }
-            }
-
-            return true;
-        };
+        $scope.$watchGroup([$attrs[DateParserDirective.MODEL_FORMAT_ATTRIBUTE], $attrs[DateParserDirective.VIEW_FORMAT_ATTRIBUTE]], () => {
+            refreshAttributes();
+            ngModelController.$processModelValue();
+        });
     }
 }
