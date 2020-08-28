@@ -39,7 +39,7 @@ module.exports = ({
                 ]
             },
             {
-                test: /\.(js|ts)$/,
+                test: /\.ts$/,
                 enforce: 'post',
                 loader: 'istanbul-instrumenter-loader',
                 exclude: [/((\.spec\.)|test|node_modules)/],

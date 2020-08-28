@@ -1,85 +1,155 @@
 import {DateTime} from 'luxon/src/luxon';
 import directivesModule from './kp-date-parser.module';
+import KpDateParserServiceProvider, {KpDateParserService} from './kp-date-parser.provider';
+import KpDateParserValidationService from './kp-date-parser-validation.service';
 import angular = require('angular');
 
 describe('kp-date-parser directive', () => {
     let $compile;
     let $scope;
 
-    function compileElement(template) {
+    function compileElement<T = HTMLElement>(template: string): T {
         const element = angular.element(template);
         const compiledElement = $compile(element)($scope);
-        $scope.$digest();
-        return compiledElement;
+        $scope.$apply();
+        return compiledElement[0];
     }
 
-    function compileAndReturnInputRef(template) {
+    function compileAndReturnInputRef(template: string): HTMLInputElement {
         const el = compileElement(template);
-        return angular.element(el[0].querySelector('input'));
+        return el.querySelector('input');
     }
 
-    function changeInputValue(input, value) {
-        input.val(value);
-        input.triggerHandler('change');
+    function changeInputValue(input: HTMLElement, value: string) {
+        angular.element(input).val(value);
+        angular.element(input).triggerHandler('change');
     }
 
     describe('provider & service', () => {
-
         it('should have default values', () => {
             angular.mock.module(directivesModule);
 
-            inject((dateParserService) => {
+            inject((kpDateParserService) => {
 
-                expect(dateParserService.getParsingPipeline()).toEqual(['d.L.y', 'dd.L.y', 'd.LL.y', 'dd.LL.y']);
-                expect(dateParserService.getViewFormat()).toBe('d.L.y');
+                expect(kpDateParserService.getParsingPipeline()).toEqual(['d.L.y', 'dd.L.y', 'd.LL.y', 'dd.LL.y']);
             });
 
         });
 
         it('should clear parsing pipeline', () => {
-            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
-                dateParserServiceProvider.clearDateFormatsPipeline();
+            angular.mock.module(directivesModule, (kpDateParserServiceProvider) => {
+                kpDateParserServiceProvider.clearDateFormatsPipeline();
             });
 
-            inject((dateParserService) => {
-                expect(dateParserService.getParsingPipeline()).toEqual([]);
+            inject((kpDateParserService) => {
+                expect(kpDateParserService.getParsingPipeline()).toEqual([]);
             });
         });
 
         it('should add new format', () => {
-            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
-                dateParserServiceProvider.clearDateFormatsPipeline();
-                dateParserServiceProvider.pushNewFormatToPipeline('a.B.c');
+            angular.mock.module(directivesModule, (kpDateParserServiceProvider) => {
+                kpDateParserServiceProvider.clearDateFormatsPipeline();
+                kpDateParserServiceProvider.pushNewFormatToPipeline('a.B.c');
             });
 
-            inject((dateParserService) => {
-                expect(dateParserService.getParsingPipeline()).toEqual(['a.B.c']);
+            inject((kpDateParserService) => {
+                expect(kpDateParserService.getParsingPipeline()).toEqual(['a.B.c']);
             });
         });
 
         it('should restore defaults', () => {
-            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
-                dateParserServiceProvider.clearDateFormatsPipeline();
-                dateParserServiceProvider.setFormatsPipelineToDefault();
+            angular.mock.module(directivesModule, (kpDateParserServiceProvider) => {
+                kpDateParserServiceProvider.clearDateFormatsPipeline();
+                kpDateParserServiceProvider.setFormatsPipelineToDefault();
             });
 
-            inject((dateParserService) => {
-                expect(dateParserService.getParsingPipeline()).toEqual(['d.L.y', 'dd.L.y', 'd.LL.y', 'dd.LL.y']);
+            inject((kpDateParserService) => {
+                expect(kpDateParserService.getParsingPipeline()).toEqual(['d.L.y', 'dd.L.y', 'd.LL.y', 'dd.LL.y']);
             });
         });
 
-        it('should change view format', () => {
-            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
-                dateParserServiceProvider.setViewDefaultFormat('a.B.c');
-            });
+        it('should parse to ISO', () => {
+            angular.mock.module(directivesModule);
 
-            inject((dateParserService) => {
-                expect(dateParserService.getViewFormat()).toEqual('a.B.c');
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.parse('12.5.1992')).toEqual(DateTime.fromFormat('12.5.1992', 'd.L.y').toISO());
+            });
+        });
+
+        it('should parse to custom model value', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.parse('3.5.1992', () => 'dd.LL.yy')).toEqual('03.05.92');
+            });
+        });
+
+        it('should parse to default model value provided by provider', () => {
+            angular.mock.module(directivesModule, /*@ngInject*/ (kpDateParserServiceProvider: KpDateParserServiceProvider) => kpDateParserServiceProvider.setDefaultModelFormat('dd.LL.yy'));
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.parse('3.5.1992')).toEqual('03.05.92');
+            });
+        });
+
+        it('should parse to custom model and override default value provided by provider', () => {
+            angular.mock.module(directivesModule, /*@ngInject*/ (kpDateParserServiceProvider: KpDateParserServiceProvider) => kpDateParserServiceProvider.setDefaultModelFormat('dd.LL.yy'));
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.parse('3.5.1992', () => 'y')).toEqual('1992');
+            });
+        });
+
+        it('should parse view by custom view format', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.parse('1992', () => 'dd.LL.y', () => 'y')).toEqual('01.01.1992');
+            });
+        });
+
+        it('should format model from ISO to ISO', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.format(DateTime.fromFormat('12.5.1992', 'd.L.y').toISO())).toEqual(DateTime.fromFormat('12.5.1992', 'd.L.y').toISO());
+            });
+        });
+
+        it('should format model from default model format provided by provider to ISO', () => {
+            angular.mock.module(directivesModule, /*@ngInject*/ (kpDateParserServiceProvider: KpDateParserServiceProvider) => kpDateParserServiceProvider.setDefaultModelFormat('dd.LL.yy'));
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.format('12.05.1992')).toEqual(DateTime.fromFormat('12.5.1992', 'd.L.y').toISO());
+            });
+        });
+
+        it('should format model from custom model format to ISO', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.format('12.05.1992', () => 'dd.LL.yy')).toEqual(DateTime.fromFormat('12.5.1992', 'd.L.y').toISO());
+            });
+        });
+
+        it('should override default model format by custom model format and convert it to ISO', () => {
+            angular.mock.module(directivesModule, /*@ngInject*/ (kpDateParserServiceProvider: KpDateParserServiceProvider) => kpDateParserServiceProvider.setDefaultModelFormat('dd.LL.yy'));
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.format('3.5.1992', () => 'd.L.y')).toEqual(DateTime.fromFormat('3.5.1992', 'd.L.y').toISO());
+            });
+        });
+
+        it('should format model from custom model format to ISO', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.format('02.05.92', () => 'dd.LL.yy', () => 'd.L.y')).toEqual('2.5.1992');
             });
         });
     });
 
-    describe('default directive behaviour', () => {
+    describe('directive', () => {
 
         beforeEach(() => {
             angular.mock.module(directivesModule);
@@ -108,31 +178,79 @@ describe('kp-date-parser directive', () => {
             }
         });
 
-        it('should validate input by default validation and with ng-required', () => {
+        it('should parse date to custom model format', () => {
+            $scope.model = '';
+            const input = compileElement(`<input type="text" ng-model="model" kp-date-parser kp-date-parser-model-format="'dd.LL.yy'">`);
 
-            const template = `
-				<form name="form">
-					<input type="text" name="date" ng-model="date" ng-required="true" kp-date-parser>
-				</form>
-			`;
+            changeInputValue(input, '2.3.1990');
 
-            const input = compileAndReturnInputRef(template);
+            expect($scope.model).toBe('02.03.90');
+        });
 
-            expect($scope.form.date.$valid).toBe(false);
-            expect($scope.form.date.$error.required).toBe(true);
+        it('should format model to custom view format', () => {
+            $scope.model = '05.05.05';
 
-            changeInputValue(input, '15.3.2018');
+            const input = compileElement<HTMLInputElement>(`<input type="text" ng-model="model" kp-date-parser kp-date-parser-model-format="'dd.LL.yy'" kp-date-parser-view-format="'y'">`);
 
-            expect($scope.form.date.$valid).toBe(true);
-
-            changeInputValue(input, '1c5.3.2018');
-
-            expect($scope.form.date.$valid).toBe(false);
-            expect($scope.form.date.$error.date).toBe(true);
+            expect(input.value).toBe('2005');
         });
     });
 
-    describe('additional validations', () => {
+    describe('validation service', () => {
+
+        it('should validate date', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserValidationService: KpDateParserValidationService) => {
+
+                let isValid = kpDateParserValidationService.validateDate()(null, '10.03.1990');
+                expect(isValid).toBeTrue();
+
+                isValid = kpDateParserValidationService.validateDate()(null, '10.03.');
+                expect(isValid).toBeFalse();
+
+                isValid = kpDateParserValidationService.validateDate(() => 'dd.LL.')(null, '10.03.');
+                expect(isValid).toBeTrue();
+            });
+        });
+
+        it('should validate minDate', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserValidationService: KpDateParserValidationService) => {
+
+                let isValid = kpDateParserValidationService.validateMinDate(() => '1990-03-10')(null, '10.03.1990');
+                expect(isValid).toBeTrue();
+
+                isValid = kpDateParserValidationService.validateMinDate(() => '1990-03-10')(null, '09.03.1990');
+                expect(isValid).toBeFalse();
+
+                isValid = kpDateParserValidationService.validateMinDate(() => '1990-03-10')(null, '11.03.1990');
+                expect(isValid).toBeTrue();
+            });
+
+        });
+
+        it('should validate maxDate', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserValidationService: KpDateParserValidationService) => {
+
+                let isValid = kpDateParserValidationService.validateMaxDate(() => '1990-03-10')(null, '10.03.1990');
+                expect(isValid).toBeTrue();
+
+                isValid = kpDateParserValidationService.validateMaxDate(() => '1990-03-10')(null, '11.03.1990');
+                expect(isValid).toBeFalse();
+
+                isValid = kpDateParserValidationService.validateMaxDate(() => '1990-03-10')(null, '09.03.1990');
+                expect(isValid).toBeTrue();
+            });
+
+        });
+
+    });
+
+    describe('validations', () => {
 
         beforeEach(() => {
             angular.mock.module(directivesModule);
@@ -147,24 +265,22 @@ describe('kp-date-parser directive', () => {
         it('should validate by max-date', () => {
             const template = `
 				<form name="form">
-					<input type="text" name="date" ng-model="date" kp-date-parser max-date="'2018-03-15T00:00:00'">
+					<input type="text" name="date" ng-model="date" kp-date-parser max-date="'2018-03-15'">
 				</form>
 			`;
 
             const input = compileAndReturnInputRef(template);
-
-            changeInputValue(input, '14.3.2018');
             expect($scope.form.date.$valid).toBe(true);
 
             changeInputValue(input, '16.3.2018');
             expect($scope.form.date.$valid).toBe(false);
-            expect($scope.form.date.$error.maxDate).toBe(true);
+            expect($scope.form.date.$error).toEqual({maxDate: true});
         });
 
         it('should validate by min-date', () => {
             const template = `
 				<form name="form">
-					<input type="text" name="date" ng-model="date" kp-date-parser min-date="'2018-03-15T00:00:00'">
+					<input type="text" name="date" ng-model="date" kp-date-parser min-date="'2018-03-15'">
 				</form>
 			`;
 
@@ -175,7 +291,7 @@ describe('kp-date-parser directive', () => {
 
             changeInputValue(input, '14.3.2018');
             expect($scope.form.date.$valid).toBe(false);
-            expect($scope.form.date.$error.minDate).toBe(true);
+            expect($scope.form.date.$error).toEqual({minDate: true});
         });
 
         it('should not validate by max-date', () => {
@@ -224,11 +340,11 @@ describe('kp-date-parser directive', () => {
             changeInputValue(input, '16.3.2018');
             expect($scope.form.date.$valid).toBe(true);
 
-            $scope.minDate = '2018-03-18T00:00:00';
-            $scope.$digest();
+            $scope.minDate = '2018-03-18';
+            $scope.$apply();
 
             expect($scope.form.date.$valid).toBe(false);
-            expect($scope.form.date.$error.minDate).toBe(true);
+            expect($scope.form.date.$error).toEqual({minDate: true});
 
         });
 
@@ -252,94 +368,6 @@ describe('kp-date-parser directive', () => {
             expect($scope.form.date.$valid).toBe(false);
             expect($scope.form.date.$error.maxDate).toBe(true);
 
-        });
-    });
-
-    describe('custom view format', () => {
-
-        beforeEach(() => {
-            angular.mock.module(directivesModule);
-
-            // tslint:disable-next-line:variable-name
-            inject((_$compile_, _$rootScope_) => {
-                $compile = _$compile_;
-                $scope = _$rootScope_;
-            });
-        });
-
-        it('should change view format by specified format in template', () => {
-            $scope.date = '2018-03-15T00:00:00';
-
-            const input = compileElement(`<input type="text" ng-model="date" kp-date-parser view-format="dd/LL/yy">`);
-
-            const viewValue = input.val();
-
-            expect(viewValue).toBe('15/03/18');
-        });
-    });
-
-    describe('provider -> directive', () => {
-
-        it('should parse date before year 1891', () => {
-
-            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
-                dateParserServiceProvider.pushNewFormatToPipeline('y');
-            });
-
-            // tslint:disable-next-line:variable-name
-            inject((_$compile_, _$rootScope_) => {
-                $compile = _$compile_;
-                $scope = _$rootScope_;
-            });
-
-            $scope.model = '';
-            const input = compileElement('<input type="text" ng-model="model" kp-date-parser>');
-            const year = DateTime.fromISO('1018-03-05').year;
-            const date = '1018';
-
-            changeInputValue(input, date);
-
-            expect(DateTime.fromISO($scope.model).year).toBe(year);
-
-        });
-
-
-        it('should parse added format via provider', () => {
-            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
-                dateParserServiceProvider.pushNewFormatToPipeline('dd.LL.y HH:mm');
-            });
-
-            // tslint:disable-next-line:variable-name
-            inject((_$compile_, _$rootScope_) => {
-                $compile = _$compile_;
-                $scope = _$rootScope_;
-            });
-
-            const input = compileElement(`<input type="text" ng-model="date" kp-date-parser>`);
-
-            changeInputValue(input, '15.03.2018 11:45');
-
-            expect($scope.date).toMatch(/^2018-03-15T11:45:00/);
-        });
-
-        it('should set default view format', () => {
-            angular.mock.module(directivesModule, (dateParserServiceProvider) => {
-                dateParserServiceProvider.setViewDefaultFormat('dd/LL/yy');
-            });
-
-            // tslint:disable-next-line:variable-name
-            inject((_$compile_, _$rootScope_) => {
-                $compile = _$compile_;
-                $scope = _$rootScope_;
-            });
-
-            $scope.date = '2018-03-15T00:00:00';
-
-            const input = compileElement(`<input type="text" ng-model="date" kp-date-parser>`);
-
-            const viewValue = input.val();
-
-            expect(viewValue).toBe('15/03/18');
         });
     });
 });

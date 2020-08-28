@@ -1,10 +1,38 @@
 const path = require('path');
 
+const isDebugging = (() => {
+    const TCPWrap = process.binding('tcp_wrap');
+    const {TCP} = TCPWrap;
+    const tcp = new TCP(TCPWrap.constants.SERVER);
+    let error;
+
+    function doBind() {
+        let err = tcp.bind6('::', process.debugPort);
+        if (err) {
+            err = tcp.bind('0.0.0.0', process.debugPort);
+        }
+
+        return err;
+    }
+
+    doBind();
+
+    error = doBind();
+
+    if (error) {
+        tcp.close();
+        return false;
+    }
+
+    return true;
+})();
+
 module.exports = (config) => {
     config.set({
         basePath: path.resolve(__dirname, '..'),
 
         frameworks: ['jasmine'],
+
         client: {
             jasmine: {
                 random: false
@@ -14,7 +42,7 @@ module.exports = (config) => {
         files: [
             path.resolve(__dirname, '..', 'node_modules', 'angular', 'angular.js'),
             path.resolve(__dirname, '..', 'node_modules', 'angular-mocks', 'angular-mocks.js'),
-            './src/**/*.spec.ts'
+            './test/all-tests.spec.ts'
         ],
 
         preprocessors: {
@@ -31,7 +59,7 @@ module.exports = (config) => {
             require('karma-chrome-launcher')
         ],
 
-        browsers: ['ChromiumHeadlessNoSandbox'],
+        browsers: [isDebugging ? 'ChromiumNoSandbox' : 'ChromiumHeadlessNoSandbox'],
 
         customLaunchers: {
             'ChromiumHeadlessNoSandbox': {
@@ -41,10 +69,17 @@ module.exports = (config) => {
                     '--no-sandbox'
                 ],
                 debug: true
+            },
+            'ChromiumNoSandbox': {
+                base: 'Chromium',
+                flags: [
+                    '--disable-gpu'
+                ],
+                debug: true
             }
         },
 
-        singleRun: true,
+        singleRun: !isDebugging,
 
         reporters: ['spec', 'coverage-istanbul'],
 
@@ -55,7 +90,7 @@ module.exports = (config) => {
         },
 
         coverageIstanbulReporter: {
-            reports: ['text-summary', 'lcov'],
+            reports: ['text-summary', 'html'],
             dir: path.resolve(__dirname, '..', 'reports', 'coverage'),
             fixWebpackSourcePaths: true,
             combineBrowserReports: true,
@@ -66,7 +101,7 @@ module.exports = (config) => {
                 global: {
                     statements: 90,
                     lines: 90,
-                    branches: 90,
+                    branches: 80,
                     functions: 90
                 }
             }

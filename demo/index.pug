@@ -1,0 +1,24 @@
+doctype html
+
+html
+	head
+		title angularjs-date-parser demo
+		link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css")
+
+	body(ng-app="demo")
+		form.container(name="form" ng-controller="demoController as dc")
+			input.form-control(
+				type="text"
+				name="date"
+				ng-model="model"
+
+				kp-date-parser
+				kp-date-parser-model-format="'d.L.y'"
+				kp-date-parser-view-format="'y'"
+
+				min-date="'1990-03-15'"
+				)
+
+			input.form-control(type="text" ng-model="model")
+			pre {{form.date.$error | json}}
+
