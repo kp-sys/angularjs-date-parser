@@ -63,8 +63,8 @@
  * @requires service:dateParserService
  * @requires ngModel
  *
- * @param {string} kpDateParserModelFormat Custom model format.
- * @param {string} kpDateParserViewFormat Custom view format.
+ * @param {string} kpDateParserModelFormat Custom model format. It supports formats from Luxon.
+ * @param {string} kpDateParserViewFormat Custom view format. It supports formats from Luxon. Also, supports a special format `'iso'`.
  *
  * @param {expression=} minDate Minimum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  * @param {expression=} maxDate Maximum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.

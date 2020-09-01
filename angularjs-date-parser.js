@@ -173,8 +173,8 @@ Object.defineProperty(exports, "__esModule", {
  * @requires service:dateParserService
  * @requires ngModel
  *
- * @param {string} kpDateParserModelFormat Custom model format.
- * @param {string} kpDateParserViewFormat Custom view format.
+ * @param {string} kpDateParserModelFormat Custom model format. It supports formats from Luxon.
+ * @param {string} kpDateParserViewFormat Custom view format. It supports formats from Luxon. Also, supports a special format `'iso'`.
  *
  * @param {expression=} minDate Minimum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
  * @param {expression=} maxDate Maximum date validation given in {@link string} [ISO format](https://en.wikipedia.org/wiki/ISO_8601) or null for disable it.
@@ -385,6 +385,7 @@ var luxon_1 = __webpack_require__(0);
 
 var bind_decorator_1 = __webpack_require__(6);
 
+var ISO_FORMAT_STRING = 'ISO';
 var DEFAULT_DATE_FORMATS = ['d.L.y', 'dd.L.y', 'd.LL.y', 'dd.LL.y']; // https://github.com/moment/luxon/issues/632
 
 function tzIncludingSecondsBugWorkaround(date) {
@@ -524,7 +525,12 @@ function () {
         var format = formatsIterator.next();
 
         while (!result.isValid && !format.done) {
-          result = luxon_1.DateTime.fromFormat(parsingDate, format.value);
+          if (format.value.toUpperCase() === ISO_FORMAT_STRING) {
+            result = luxon_1.DateTime.fromISO(parsingDate);
+          } else {
+            result = luxon_1.DateTime.fromFormat(parsingDate, format.value);
+          }
+
           format = formatsIterator.next();
         }
 
@@ -562,7 +568,7 @@ function () {
           parsedDate = luxon_1.DateTime.fromISO(formattingDate);
         }
 
-        if (customViewFormatProvider && customViewFormatProvider()) {
+        if (customViewFormatProvider && customViewFormatProvider() && customViewFormatProvider().toUpperCase() !== ISO_FORMAT_STRING) {
           return parsedDate.toFormat(customViewFormatProvider());
         }
 
