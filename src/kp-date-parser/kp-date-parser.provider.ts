@@ -3,6 +3,8 @@ import bind from 'bind-decorator';
 import {ILogService} from 'angular';
 import {Console} from 'inspector';
 
+const ISO_FORMAT_STRING = 'ISO';
+
 const DEFAULT_DATE_FORMATS = [
     'd.L.y',
     'dd.L.y',
@@ -194,7 +196,11 @@ export default class KpDateParserServiceProvider {
             let format = formatsIterator.next();
 
             while (!result.isValid && !format.done) {
-                result = DateTime.fromFormat(parsingDate, format.value);
+                if (format.value.toUpperCase() === ISO_FORMAT_STRING) {
+                    result = DateTime.fromISO(parsingDate);
+                } else {
+                    result = DateTime.fromFormat(parsingDate, format.value);
+                }
                 format = formatsIterator.next();
             }
 
@@ -234,7 +240,7 @@ export default class KpDateParserServiceProvider {
                 parsedDate = DateTime.fromISO(formattingDate);
             }
 
-            if (customViewFormatProvider && customViewFormatProvider()) {
+            if (customViewFormatProvider && customViewFormatProvider() && customViewFormatProvider().toUpperCase() !== ISO_FORMAT_STRING) {
                 return parsedDate.toFormat(customViewFormatProvider());
             }
 

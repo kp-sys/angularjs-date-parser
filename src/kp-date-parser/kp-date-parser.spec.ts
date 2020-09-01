@@ -187,12 +187,20 @@ describe('kp-date-parser directive', () => {
             expect($scope.model).toBe('02.03.90');
         });
 
-        it('should format model to custom view format', () => {
+        it('should format view to custom view format', () => {
             $scope.model = '05.05.05';
 
             const input = compileElement<HTMLInputElement>(`<input type="text" ng-model="model" kp-date-parser kp-date-parser-model-format="'dd.LL.yy'" kp-date-parser-view-format="'y'">`);
 
             expect(input.value).toBe('2005');
+        });
+
+        it('should format view to special view format - ’ISO’', () => {
+            $scope.model = '05.05.05';
+
+            const input = compileElement<HTMLInputElement>(`<input type="text" ng-model="model" kp-date-parser kp-date-parser-model-format="'dd.LL.yy'" kp-date-parser-view-format="'iso'">`);
+
+            expect(input.value).toBe(DateTime.fromFormat('05.05.05', 'dd.LL.yy').toISO());
         });
     });
 
