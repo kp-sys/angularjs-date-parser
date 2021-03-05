@@ -1,6 +1,6 @@
 {
   "name": "@kpsys/angularjs-date-parser",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "author": {
     "email": "tomas.dostal@kpsys.cz",
     "name": "Tomas Dostal"
@@ -11,7 +11,7 @@
   "description": "Date parser directive for AngularJS",
   "repository": "https://github.com/kp-sys/angularjs-date-parser.git",
   "peerDependencies": {
-    "angular": "1.7.x",
+    "angular": "1.x",
     "luxon": "1.x",
     "@kpsys/angularjs-register": "1.x"
   },
