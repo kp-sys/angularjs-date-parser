@@ -3,4 +3,4 @@
 # angularjs-date-parser
 Date parser directive for AngularJS
 
-[Documentation](https://dostaltomas.github.io/angularjs-date-parser/#/api/kpDateParser)
+[Documentation](https://kp-sys.github.io/angularjs-date-parser/#/api/kpDateParser)
