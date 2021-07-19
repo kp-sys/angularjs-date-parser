@@ -12,22 +12,6 @@ const DEFAULT_DATE_FORMATS = [
     'dd.LL.y'
 ];
 
-// https://github.com/moment/luxon/issues/632
-function tzIncludingSecondsBugWorkaround(date: DateTime): DateTime {
-    if (date) {
-        const isoDate = date.toISO();
-        const tz: string[] = isoDate.split('T')[1].match(/[+-].*$/);
-
-        if (tz && tz[0] && tz[0] === '+00:57') {
-            // @ts-ignore
-            const result = isoDate.replace(tz[0], LocalZone.instance.formatOffset(new Date().getTimezoneOffset(), 'short'));
-            return DateTime.fromISO(result);
-        }
-    }
-
-    return date;
-}
-
 /**
  * @ngdoc service
  * @module kpDateParser
@@ -185,7 +169,7 @@ export default class KpDateParserServiceProvider {
         }
 
         try {
-            let result = {isValid: false};
+            let result: DateTime | {isValid: boolean} = {isValid: false};
             const parsingPipeline = this.#parsingPipeline.slice();
 
             if (customViewFormatProvider && customViewFormatProvider()) {
@@ -205,15 +189,15 @@ export default class KpDateParserServiceProvider {
             }
 
             if (result.isValid) {
-                const patchedDateTime = tzIncludingSecondsBugWorkaround(result as DateTime);
+                const dateTime = result as DateTime;
 
                 const customModel = customModelFormatProvider ? customModelFormatProvider() : null;
 
                 if (customModel || this.#defaultModelFormat) {
-                    return patchedDateTime.toFormat(customModel || this.#defaultModelFormat);
+                    return dateTime.toFormat(customModel || this.#defaultModelFormat);
                 }
 
-                return patchedDateTime.toISO();
+                return dateTime.toISO();
             }
         } catch (e) {
             /* istanbul ignore next */
