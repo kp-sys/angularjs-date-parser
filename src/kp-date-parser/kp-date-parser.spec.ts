@@ -108,6 +108,14 @@ describe('kp-date-parser directive', () => {
             });
         });
 
+        it('should parse pre-1891 date to ISO with correct historic timezone +00:57', () => {
+            angular.mock.module(directivesModule);
+
+            inject(/*@ngInject*/ (kpDateParserService: KpDateParserService) => {
+                expect(kpDateParserService.parse('1.1.1666')).toEqual(DateTime.fromFormat('1.1.1666', 'd.L.y').toISO());
+            });
+        });
+
         it('should format model from ISO to ISO', () => {
             angular.mock.module(directivesModule);
 
@@ -201,6 +209,17 @@ describe('kp-date-parser directive', () => {
             const input = compileElement<HTMLInputElement>(`<input type="text" ng-model="model" kp-date-parser kp-date-parser-model-format="'dd.LL.yy'" kp-date-parser-view-format="'iso'">`);
 
             expect(input.value).toBe(DateTime.fromFormat('05.05.05', 'dd.LL.yy').toISO());
+        });
+
+        it('should correctly parse date before year 1891', () => {
+            $scope.model = '';
+            const input = compileElement(`<input type="text" ng-model="model" kp-date-parser kp-date-parser-view-format="'y'">`);
+            const year = DateTime.fromISO('1018-03-05').year;
+            const date = '1018';
+
+            changeInputValue(input, date);
+
+            expect(DateTime.fromISO($scope.model).year).toBe(year);
         });
     });
 
