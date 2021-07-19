@@ -1,0 +1,56 @@
+name: Build Master
+
+on:
+  push:
+    branches:
+      - 'master'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+
+      - run: npm ci
+      - run: npm run lib:prod
+
+      - run: rm -rf ./node_modules ./docs ./reports ./test ./.git
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: .
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+
+      - run: npm ci
+      - run: CHROMIUM_BIN="/usr/bin/google-chrome" npm test
+
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+
+      - run: npm ci
+      - run: EXAMPLES_SCRIPTS_URL_PREFIX="https://kp-sys.github.io/angularjs-date-parser" npm run docs:build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
