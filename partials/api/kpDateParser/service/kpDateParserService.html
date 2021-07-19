@@ -1,0 +1,292 @@
+
+
+
+
+<header class="api-profile-header">
+  <h1 class="api-profile-header-heading">kpDateParserService</h1>
+  <ol class="api-profile-header-structure naked-list step-list">
+    
+  <li>
+    <a href="api/kpDateParser/provider/kpDateParserServiceProvider">- kpDateParserServiceProvider</a>
+  </li>
+
+    <li>
+      - service in module <a href="api/kpDateParser">kpDateParser</a>
+    </li>
+  </ol>
+</header>
+
+
+
+<div class="api-profile-description">
+  
+</div>
+
+
+
+
+
+
+<div>
+  
+
+  
+<h2>Methods</h2>
+<ul class="methods">
+  <li id="getParsingPipeline">
+    <h3 class="">
+      <span class="title"><p><code>getParsingPipeline();</code></p>
+
+</span>
+      
+      
+  
+    </h3>
+    <div><p>Returns parsing pipeline.</p>
+</div>
+
+    
+
+    
+    
+    
+    <h4>Returns</h4>
+    <table class="variables-matrix return-arguments">
+  <tr>
+    <td><span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">Array.&lt;String&gt;</a></span></td>
+    <td></td>
+  </tr>
+</table>
+    
+
+    
+  </li>
+  
+  <li id="getDefaultModelFormat">
+    <h3 class="">
+      <span class="title"><p><code>getDefaultModelFormat();</code></p>
+
+</span>
+      
+      
+  
+    </h3>
+    <div><p>Returns default model format.</p>
+</div>
+
+    
+
+    
+    
+    
+    <h4>Returns</h4>
+    <table class="variables-matrix return-arguments">
+  <tr>
+    <td><span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span></td>
+    <td></td>
+  </tr>
+</table>
+    
+
+    
+  </li>
+  
+  <li id="parse">
+    <h3 class="">
+      <span class="title"><p><code>parse(parsingDate, [customModelFormatProvider], [customViewFormatProvider]);</code></p>
+
+</span>
+      
+      
+  
+    </h3>
+    <div><p>Function tries to parse date using formats pipeline and if no format matches, it tries to use <code>customViewFormatProvider</code> if it is specified.\
+Then parse date and returns it formatted using <code>customModelFormatProvider</code> or if it is not specified, <code>defaultModelFormat</code>.
+If no model format specified it returns ISO format.</p>
+<p>If no format matches, it returns <code>null</code>.</p>
+</div>
+
+    
+    <h4>Parameters</h4>
+    
+<table class="variables-matrix input-arguments ">
+  <thead>
+    <tr>
+      <th>Param</th>
+      <th>Type</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr>
+      <td>
+        parsingDate
+        
+        
+      </td>
+      <td>
+        <span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span>
+      </td>
+      <td>
+        
+        
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        customModelFormatProvider
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span>
+      </td>
+      <td>
+        
+        
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        customViewFormatProvider
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span>
+      </td>
+      <td>
+        
+        
+        
+      </td>
+    </tr>
+    
+  </tbody>
+</table>
+
+    
+
+    
+    
+    
+    <h4>Returns</h4>
+    <table class="variables-matrix return-arguments">
+  <tr>
+    <td><span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span></td>
+    <td><p>Parsed date in ISO / customModelFormatProvider / defaultModelFormat.</p>
+</td>
+  </tr>
+</table>
+    
+
+    
+  </li>
+  
+  <li id="format">
+    <h3 class="">
+      <span class="title"><p><code>format(formattingDate, [customModelFormatProvider], [customViewFormatProvider]);</code></p>
+
+</span>
+      
+      
+  
+    </h3>
+    <div><p>Function tries to parse date using <code>customModelFormatProvider</code> or if it is not specified, <code>defaultModelFormat</code>.
+If no format specified, ISO format is used.
+Then it is formatted with <code>customViewFormatProvider</code> or ISO is used.</p>
+<p>If parsing is unsuccessful, it returns <code>null</code>.</p>
+</div>
+
+    
+    <h4>Parameters</h4>
+    
+<table class="variables-matrix input-arguments ">
+  <thead>
+    <tr>
+      <th>Param</th>
+      <th>Type</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr>
+      <td>
+        formattingDate
+        
+        
+      </td>
+      <td>
+        <span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span>
+      </td>
+      <td>
+        
+        
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        customModelFormatProvider
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span>
+      </td>
+      <td>
+        
+        
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        customViewFormatProvider
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span>
+      </td>
+      <td>
+        
+        
+        
+      </td>
+    </tr>
+    
+  </tbody>
+</table>
+
+    
+
+    
+    
+    
+    <h4>Returns</h4>
+    <table class="variables-matrix return-arguments">
+  <tr>
+    <td><span class="label type-hint type-hint-string"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" _target="blank">String</a></span></td>
+    <td><p>Formatted date in ISO / customViewFormatProvider.</p>
+</td>
+  </tr>
+</table>
+    
+
+    
+  </li>
+  </ul>
+
+  
+</div>
+
+
