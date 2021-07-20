@@ -27,7 +27,8 @@
     "dist/",
     "src/",
     "webpack.library.config.js",
-    "tsconfig.json"
+    "tsconfig.json",
+    "!dist/docs"
   ],
   "devDependencies": {
     "@babel/core": "^7.8.4",
